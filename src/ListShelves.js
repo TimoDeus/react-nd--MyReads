@@ -2,6 +2,7 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import ListBooks from './ListBooks';
 import {knownShelves} from './utils/knownShelves';
+import PropTypes from 'prop-types';
 
 const ListShelves = props => {
 	const {getBooksForShelf, getShelfForBook, changeBook} = props;
@@ -28,6 +29,12 @@ const ListShelves = props => {
 				<Link to='/search'>Add a book</Link>
 			</div>
 		</div>);
+};
+
+ListShelves.propTypes = {
+	changeBook: PropTypes.func.isRequired,
+	getShelfForBook: PropTypes.func.isRequired,
+	getBooksForShelf: PropTypes.func.isRequired
 };
 
 export default ListShelves;
