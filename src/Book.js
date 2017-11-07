@@ -1,25 +1,26 @@
 import React from 'react';
+import {knownShelves} from './utils/knownShelves';
 
 const Book = props => {
-	const {currentShelf, book, changeBook} = props;
+	const {getShelfForBook, book, changeBook} = props;
 	return (
 		<div className="book">
 			<div className="book-top">
 				<div className="book-cover" style={{
-					backgroundImage: `url("${book.imageLinks.thumbnail}")`
+					backgroundImage: `url("${book.imageLinks ? book.imageLinks.thumbnail : ''}")`
 				}}/>
 				<div className="book-shelf-changer">
-					<select defaultValue={currentShelf} onChange={event => changeBook(book.id, event.target.value)}>
+					<select value={getShelfForBook(book)} defaultValue='none' onChange={event => changeBook(book, event.target.value)}>
 						<option value="none" disabled>Move to...</option>
-						<option value="currentlyReading">Currently Reading</option>
-						<option value="wantToRead">Want to Read</option>
-						<option value="read">Read</option>
+						{knownShelves.map(shelf =>
+							<option key={shelf.id} value={shelf.id}>{shelf.name}</option>
+						)}
 						<option value="none">None</option>
 					</select>
 				</div>
 			</div>
 			<div className="book-title">{book.title}</div>
-			<div className="book-authors">{book.authors.join(', ')}</div>
+			{book.authors && <div className="book-authors">{book.authors.join(', ')}</div> }
 		</div>
 	);
 };

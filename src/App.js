@@ -1,50 +1,59 @@
 import React from 'react';
 import * as BooksAPI from './BooksAPI'
 import './App.css';
-import {Route, Link} from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import ListShelves from './ListShelves';
+import SearchBooks from './SearchBooks';
 
 class BooksApp extends React.Component {
 	state = {
-		books: []
+		currentlyReading: [],
+		wantToRead: [],
+		read: []
 	};
 
 	componentDidMount() {
-		this.fetchAllBooks();
+		this.fetchAndGroupAllBooks();
 	}
 
-	fetchAllBooks = () => BooksAPI.getAll().then(books => this.setState({books}));
+	fetchAndGroupAllBooks = () => BooksAPI.getAll().then(
+		books => {
+			const result = books.reduce((obj, book) => {
+				obj[book.shelf] = obj[book.shelf] || [];
+				obj[book.shelf].push(book);
+				return obj;
+			}, Object.create(null));
+			this.setState(result);
+		}
+	);
 
-	changeBook = (bookId, shelfId) => {
-		BooksAPI.update(bookId, shelfId).then(
-			data => {} // TODO do something clever with the rather useless response
+	changeBook = (book, shelfId) => {
+		BooksAPI.update(book, shelfId).then(
+			() => this.fetchAndGroupAllBooks()
 		)
 	};
 
 	getBooksForShelf = shelfId => {
-		return this.state.books.filter(book => book.shelf === shelfId);
+		return this.state[shelfId];
+	};
+
+	getShelfForBook = book => {
+		return Object.keys(this.state).find(shelfId => this.state[shelfId].some(elem => elem.id === book.id));
 	};
 
 	render() {
 		return (
 			<div className="app">
 				<Route path='/search' render={() => (
-					<div className="search-books">
-						<div className="search-books-bar">
-							<Link to='/'>Close</Link>
-							<div className="search-books-input-wrapper">
-								<input type="text" placeholder="Search by title or author"/>
-							</div>
-						</div>
-						<div className="search-books-results">
-							<ol className="books-grid"/>
-						</div>
-					</div>
+					<SearchBooks
+						changeBook={this.changeBook}
+						getShelfForBook={this.getShelfForBook}
+					/>
 				)}/>
 				<Route exact path='/' render={() => (
 					<ListShelves
-						shelves={[...new Set(this.state.books.map(book => book.shelf))]}
 						getBooksForShelf={this.getBooksForShelf}
+						getShelfForBook={this.getShelfForBook}
 						changeBook={this.changeBook}
 					/>
 				)}/>

@@ -1,8 +1,10 @@
 import React from 'react';
-import BookShelf from './BookShelf';
+import {Link} from 'react-router-dom';
+import ListBooks from './ListBooks';
+import {knownShelves} from './utils/knownShelves';
 
 const ListShelves = props => {
-	const {shelves, getBooksForShelf, changeBook} = props;
+	const {getBooksForShelf, getShelfForBook, changeBook} = props;
 	return (
 		<div className="list-books">
 			<div className="list-books-title">
@@ -10,15 +12,20 @@ const ListShelves = props => {
 			</div>
 			<div className="list-books-content">
 				<div>
-					{
-						shelves.map(shelfId => {
-							return <BookShelf key={shelfId} id={shelfId} books={getBooksForShelf(shelfId)} changeBook={changeBook}/>
-						})
-					}
+					{knownShelves.map(({id, name}) =>
+						<div className="bookshelf" key={id}>
+							<h2 className="bookshelf-title">{name}</h2>
+							<div className="bookshelf-books">
+								<ListBooks books={getBooksForShelf(id)}
+													 changeBook={changeBook}
+													 getShelfForBook={getShelfForBook}/>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 			<div className="open-search">
-				<a onClick={() => this.setState({showSearchPage: true})}>Add a book</a>
+				<Link to='/search'>Add a book</Link>
 			</div>
 		</div>);
 };
