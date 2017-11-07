@@ -1,11 +1,10 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import ListBooks from './ListBooks';
-import {knownShelves} from './utils/knownShelves';
 import PropTypes from 'prop-types';
 
 const ListShelves = props => {
-	const {getBooksForShelf, getShelfForBook, changeBook} = props;
+	const {shelves, addBookToShelf} = props;
 	return (
 		<div className="list-books">
 			<div className="list-books-title">
@@ -13,13 +12,11 @@ const ListShelves = props => {
 			</div>
 			<div className="list-books-content">
 				<div>
-					{knownShelves.map(({id, name}) =>
+					{shelves.map(({id, name, books}) =>
 						<div className="bookshelf" key={id}>
 							<h2 className="bookshelf-title">{name}</h2>
 							<div className="bookshelf-books">
-								<ListBooks books={getBooksForShelf(id)}
-													 changeBook={changeBook}
-													 getShelfForBook={getShelfForBook}/>
+								<ListBooks books={books} addBookToShelf={addBookToShelf} />
 							</div>
 						</div>
 					)}
@@ -32,9 +29,8 @@ const ListShelves = props => {
 };
 
 ListShelves.propTypes = {
-	changeBook: PropTypes.func.isRequired,
-	getShelfForBook: PropTypes.func.isRequired,
-	getBooksForShelf: PropTypes.func.isRequired
+	addBookToShelf: PropTypes.func.isRequired,
+	shelves: PropTypes.array.isRequired
 };
 
 export default ListShelves;

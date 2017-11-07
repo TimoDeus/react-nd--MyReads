@@ -21,6 +21,17 @@ class SearchBooks extends Component {
 	};
 
 	/**
+	 * get the corresponding shelf for a book, 'none' if there is none
+	 * @param book book object
+	 * @return {string} shelf id
+	 */
+	getShelfForBook = book => {
+		const {shelves} = this.props;
+		const currentShelf = shelves.find(({books}) => books.some(shelfBook => shelfBook.id === book.id));
+		return currentShelf ? currentShelf.id : 'none';
+	};
+
+	/**
 	 * search for given term and update state with results.
 	 *
 	 * Note: API has no proper error handling. If error occured, response is an object, otherwise an array...
@@ -31,12 +42,16 @@ class SearchBooks extends Component {
 	searchBooks = (query, maxResults = 20) => BooksAPI.search(query, maxResults).then(
 		data => {
 			const result = Array.isArray(data) ? data : [];
+			result.map(book => {
+				book.shelf = this.getShelfForBook(book);
+				return book;
+			});
 			this.setState({searchResults: result});
 		}
 	);
 
 	render() {
-		const {changeBook, getShelfForBook} = this.props;
+		const {addBookToShelf} = this.props;
 		const {searchResults} = this.state;
 		return (
 			<div className="search-books">
@@ -47,7 +62,7 @@ class SearchBooks extends Component {
 					</div>
 				</div>
 				<div className="search-books-results">
-					{searchResults && <ListBooks books={searchResults} changeBook={changeBook} getShelfForBook={getShelfForBook}/>}
+					{searchResults && <ListBooks books={searchResults} addBookToShelf={addBookToShelf} />}
 				</div>
 			</div>
 		);
@@ -55,8 +70,8 @@ class SearchBooks extends Component {
 }
 
 SearchBooks.propTypes = {
-	changeBook: PropTypes.func.isRequired,
-	getShelfForBook: PropTypes.func.isRequired
+	addBookToShelf: PropTypes.func.isRequired,
+	shelves: PropTypes.array.isRequired
 };
 
 export default SearchBooks;

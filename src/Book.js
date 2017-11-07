@@ -1,10 +1,8 @@
 import React from 'react';
-import {knownShelves} from './utils/knownShelves';
 import PropTypes from 'prop-types';
 
 const Book = props => {
-	const {getShelfForBook, book, changeBook} = props;
-	const selectedValue = getShelfForBook(book);
+	const {book, addBookToShelf} = props;
 	return (
 		<div className="book">
 			<div className="book-top">
@@ -12,11 +10,11 @@ const Book = props => {
 					backgroundImage: `url("${book.imageLinks ? book.imageLinks.thumbnail : ''}")`
 				}}/>
 				<div className="book-shelf-changer">
-					<select value={selectedValue} defaultValue='none' onChange={event => changeBook(book, event.target.value)}>
-						<option value="none" disabled>Move to...</option>
-						{knownShelves.map(shelf =>
-							<option key={shelf.id} value={shelf.id}>{shelf.name}</option>
-						)}
+					<select value={book.shelf} onChange={event => addBookToShelf(book, event.target.value)}>
+						<option value="move" disabled>Move to...</option>
+						<option value="currentlyReading">Currently Reading</option>
+						<option value="wantToRead">Want To Read</option>
+						<option value="read">Read</option>
 						<option value="none">None</option>
 					</select>
 				</div>
@@ -28,11 +26,11 @@ const Book = props => {
 };
 
 Book.propTypes = {
-	changeBook: PropTypes.func.isRequired,
-	getShelfForBook: PropTypes.func.isRequired,
+	addBookToShelf: PropTypes.func.isRequired,
 	book: PropTypes.shape({
 		id: PropTypes.string.isRequired,
 		title: PropTypes.string.isRequired,
+		shelf: PropTypes.string,
 		authors: PropTypes.arrayOf(PropTypes.string),
 		imageLinks: PropTypes.shape({
 			thumbnail: PropTypes.string

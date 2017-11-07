@@ -39,45 +39,43 @@ class BooksApp extends React.Component {
 	 * @param {object} book the book object to modify
 	 * @param {string} shelfId the new shelf
 	 */
-	changeBook = (book, shelfId) => {
+	addBookToShelf = (book, shelfId) => {
 		BooksAPI.update(book, shelfId).then(
 			() => this.fetchAndGroupAllBooks()
 		)
 	};
 
 	/**
-	 * get all books on a given shelf
+	 * shelf id to name mapping
 	 * @param shelfId
-	 * @return array of books
+	 * @return {string} human readable shelf name
 	 */
-	getBooksForShelf = shelfId => {
-		return this.state[shelfId];
+	getShelfName = shelfId => {
+		return shelfId === 'currentlyReading' ? 'Currently Reading' :
+			(shelfId === 'wantToRead' ? 'Want To Read' : 'Read');
 	};
 
 	/**
-	 * get the corresponding shelf for a book, undefined if there is none
-	 * @param book book object
-	 * @return {string} shelf id or undefined
+	 * associate shelf with id, name and corresponding books
+	 * @return {Array|*|Object}
 	 */
-	getShelfForBook = book => {
-		return Object.keys(this.state).find(shelfId => this.state[shelfId].some(shelfElement => shelfElement.id === book.id));
+	prepareShelves = () => {
+		return Object.keys(this.state).map(shelfId => ({
+			id: shelfId,
+			name: this.getShelfName(shelfId),
+			books: this.state[shelfId] || []
+		}));
 	};
 
 	render() {
+		const shelves = this.prepareShelves();
 		return (
 			<div className="app">
 				<Route path='/search' render={() =>
-					<SearchBooks
-						changeBook={this.changeBook}
-						getShelfForBook={this.getShelfForBook}
-					/>
+					<SearchBooks addBookToShelf={this.addBookToShelf} shelves={shelves}/>
 				}/>
 				<Route exact path='/' render={() =>
-					<ListShelves
-						changeBook={this.changeBook}
-						getBooksForShelf={this.getBooksForShelf}
-						getShelfForBook={this.getShelfForBook}
-					/>
+					<ListShelves addBookToShelf={this.addBookToShelf} shelves={shelves}/>
 				}/>
 			</div>
 		)
