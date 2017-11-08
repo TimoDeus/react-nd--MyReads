@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 const ListShelves = props => {
 	const {shelves, addBookToShelf} = props;
+	const shelvesWithBooks = shelves.filter(shelf => shelf.books.length);
 	return (
 		<div className="list-books">
 			<div className="list-books-title">
@@ -12,7 +13,7 @@ const ListShelves = props => {
 			</div>
 			<div className="list-books-content">
 				<div>
-					{shelves.map(({id, name, books}) =>
+					{shelvesWithBooks.map(({id, name, books}) =>
 						<div className="bookshelf" key={id}>
 							<h2 className="bookshelf-title">{name}</h2>
 							<div className="bookshelf-books">

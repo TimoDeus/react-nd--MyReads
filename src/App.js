@@ -7,11 +7,13 @@ import SearchBooks from './SearchBooks';
 
 class BooksApp extends React.Component {
 
-	state = {
+	createInitialState = () => ({
 		currentlyReading: [],
 		wantToRead: [],
 		read: []
-	};
+	});
+
+	state = this.createInitialState();
 
 	componentDidMount() {
 		this.fetchAndGroupAllBooks();
@@ -22,11 +24,13 @@ class BooksApp extends React.Component {
 	 */
 	fetchAndGroupAllBooks = () => BooksAPI.getAll().then(
 		books => {
+			const initialState = this.createInitialState();
 			const result = books.reduce((obj, book) => {
-				obj[book.shelf] = obj[book.shelf] || [];
-				obj[book.shelf].push(book);
+				if (obj[book.shelf]) {
+					obj[book.shelf].push(book);
+				}
 				return obj;
-			}, Object.create(null));
+			}, initialState);
 			this.setState(result);
 		}
 	);
